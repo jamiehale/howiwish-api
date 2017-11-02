@@ -1,17 +1,45 @@
 {
   "name": "howiwish-server",
   "version": "0.0.0",
+  "main": "dist",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "build": "babel src -s -D -d dist",
+    "dev": "nodemon -w src --exec \"babel-node src\"",
+    "lint": "eslint src",
+    "prestart": "npm run -s build",
+    "start": "node dist"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "ecmaVersion": 7,
+      "sourceType": "module"
+    },
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "no-console": 0,
+      "no-unused-vars": 1
+    }
   },
   "dependencies": {
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
     "debug": "~2.6.9",
     "express": "~4.15.5",
     "morgan": "~1.9.0",
     "pug": "2.0.0-beta11",
+    "resource-router-middleware": "^0.7.0",
     "serve-favicon": "~2.4.5"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "eslint": "^4.10.0",
+    "nodemon": "^1.12.1"
   }
 }

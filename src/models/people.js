@@ -15,7 +15,7 @@ const createWish = (id, title, url, description, createdById) => ({
 });
 
 const people = [
-  createPerson('1', 'Jamie', [
+  createPerson('1', 'Jamiedood', [
     createWish('1', 'Some stuff', 'https://amazon.ca', 'Lots of stuff', '1')
   ]),
   createPerson('2', 'Diana'),

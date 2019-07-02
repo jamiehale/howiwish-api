@@ -1,4 +1,8 @@
-export default callback => {
-	// connect to a database if needed, then pass it to `callback`:
-	callback();
-}
+import { MongoClient } from 'mongodb';
+
+export default (url, name, callback) => () => {
+	MongoClient.connect(url, (err, db) => {
+		if (err) throw err;
+		callback(db.db(name));
+	});
+};

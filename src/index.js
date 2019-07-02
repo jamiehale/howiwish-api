@@ -20,21 +20,28 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json({
-	limit : config.bodyLimit
+	limit: config.bodyLimit
 }));
 
 // connect to db
-initializeDb( db => {
+var url = "mongodb://mongo:27017/";
+setTimeout(initializeDb(url, "howiwish", db => {
 
 	// internal middleware
-	app.use(middleware({ config, db }));
+	app.use(middleware({
+		config,
+		db
+	}));
 
 	// api router
-	app.use('/api', api({ config, db }));
+	app.use('/api', api({
+		config,
+		db
+	}));
 
 	app.server.listen(process.env.PORT || config.port, () => {
 		console.log(`Started on port ${app.server.address().port}`);
 	});
-});
+}), 1000);
 
 export default app;

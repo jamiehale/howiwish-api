@@ -3,12 +3,12 @@ import groups from './groups';
 import people from './people';
 import wishes from './wishes';
 
-export default ({ config, db }) => {
-  const api = Router();
+export default (db) => {
+  const routes = Router();
 
-  api.use('/groups', groups({ config, db }));
-  api.use('/people', people({ config, db }));
-  api.use('/people/:peopleId/wishes', wishes({ config, db }));
+  routes.use('/groups', groups(db));
+  routes.use('/people', people(db));
+  routes.use('/people/:peopleId/wishes', wishes(db));
 
-  return api;
+  return routes;
 }

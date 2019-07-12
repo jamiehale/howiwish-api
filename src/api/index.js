@@ -1,16 +1,15 @@
-import { version } from '../../package.json';
 import { Router } from 'express';
 import v1 from './v1';
+import { version } from '../../package.json';
 
-export default ({ config, db }) => {
-  let api = Router();
+export default (db) => {
+  const routes = Router();
 
-  api.use('/v1', v1({ config, db }));
-
-  // perhaps expose some API metadata at the root
-  api.get('/', (req, res) => {
+  routes.get('/version', (req, res) => {
     res.json({ version });
   });
 
-  return api;
-}
+  routes.use('/v1', v1(db));
+
+  return routes;
+};

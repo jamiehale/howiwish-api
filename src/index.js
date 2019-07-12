@@ -1,47 +1,65 @@
-import http from 'http';
+import { config } from 'dotenv';
 import express from 'express';
-import cors from 'cors';
-import morgan from 'morgan';
+import path from 'path';
+import logger from 'morgan';
 import bodyParser from 'body-parser';
-import initializeDb from './db';
-import middleware from './middleware';
+import cors from 'cors';
+import connectRepository from './db';
 import api from './api';
-import config from './config.json';
 
-let app = express();
-app.server = http.createServer(app);
+config();
 
-// logger
-app.use(morgan('dev'));
+const {
+	PORT = 4000,
+	MONGO_URL = 'mongodb://localhost:27017/',
+	MONGO_DB = 'howiwish',
+	BODY_LIMIT = '100kb',
+} = process.env;
 
-// 3rd party middleware
-app.use(cors({
-	exposedHeaders: config.corsHeaders
-}));
+const createApp = (db) => {
+  const app = express();
+  app.disable('x-powered-by');
 
-app.use(bodyParser.json({
-	limit: config.bodyLimit
-}));
-
-// connect to db
-var url = "mongodb://mongo:27017/";
-setTimeout(initializeDb(url, "howiwish", db => {
-
-	// internal middleware
-	app.use(middleware({
-		config,
-		db
+  app.use(cors());
+  app.use(logger('dev', {
+    skip: () => app.get('env') === 'test',
+  }));
+  app.use(bodyParser.json({
+		limit: BODY_LIMIT,
 	}));
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(express.static(path.join(__dirname, '../public')));
 
-	// api router
-	app.use('/api', api({
-		config,
-		db
-	}));
+  // Routes
+  app.use('/api', api(db));
 
-	app.server.listen(process.env.PORT || config.port, () => {
-		console.log(`Started on port ${app.server.address().port}`);
-	});
-}), 1000);
+  // Catch 404 and forward to error handler
+  app.use((req, res, next) => {
+    const err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+  });
 
-export default app;
+  // Error handler
+  app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
+    res
+      .status(err.status || 500)
+      .json({
+        message: err.message,
+      });
+  });
+
+  return app;
+};
+
+const run = () => {
+	connectRepository(MONGO_URL, MONGO_DB)
+		.then((db) => {
+			createApp(db)
+				.listen(PORT, () => {
+					console.log(`Listening on port ${PORT}...`);
+				});
+		});
+};
+
+run();

@@ -8,9 +8,10 @@ services:
   mongo:
     image: mongo:4.0
     restart: always
+    volumes:
+      - ./config/mongo:/docker-entrypoint-initdb.d
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: 'howiwish'
     ports:
       - "27017:27017"
   mongo-express:
@@ -18,19 +19,19 @@ services:
     restart: always
     ports:
       - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
     depends_on:
       - mongo
   server:
     build:
       context: .
     command: yarn dev
+    environment:
+      MONGO_URL: 'mongodb://mongo:27017/'
+      MONGO_DB: 'howiwish'
     volumes:
-      - ./src:/usr/src/app/src
+      - ./:/usr/src/app
     ports:
-      - 9001:9001
+      - 9001:4000
     depends_on:
       - cache
       - mongo

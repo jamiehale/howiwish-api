@@ -16,6 +16,11 @@ const {
 	BODY_LIMIT = '100kb',
 } = process.env;
 
+console.log(`PORT = ${PORT}`);
+console.log(`MONGO_URL = ${MONGO_URL}`);
+console.log(`MONGO_DB = ${MONGO_DB}`);
+console.log(`BODY_LIMIT = ${BODY_LIMIT}`);
+
 const createApp = (db) => {
   const app = express();
   app.disable('x-powered-by');
